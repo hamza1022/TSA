@@ -52,7 +52,9 @@
     "react-scale-text": "^1.2.2",
     "react-square-payment-form": "^0.7.3",
     "sitepal-react": "^1.0.2",
-    "stream": "^0.0.2"
+    "stream": "^0.0.2",
+    "paypal-rest-sdk": "^1.8.1"
+
   },
   "repository": {
     "type": "git",

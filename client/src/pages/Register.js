@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import { Navigate } from "react-router-dom";
+import React, { useEffect, useState } from "react";
+import { Navigate,useLocation  } from "react-router-dom";
 import TextField from '@mui/material/TextField';
 import Stack from '@mui/material/Stack';
 import Button from '@mui/material/Button';
@@ -11,6 +11,11 @@ import emailjs from 'emailjs-com';
 export default function Register() {
 	// ... your other useState declarations
 	const loggedInUser = localStorage.getItem("token");
+
+	const location = useLocation();
+	const params = new URLSearchParams(location.search);
+	const payment = params.get('payment');
+
 	const [username, setName] = useState("");
   	const [email, setEmail] = useState("");
   	const [school, setSchool] = useState("");
@@ -24,6 +29,8 @@ export default function Register() {
 	const [isStudent, setIsStudent] = useState(true);
 	const [schoolId, setSchoolId] = useState("");
 	const [validSchoolID, setValidSchoolID] = useState(false);
+	const [paymentPaid , setPaymentPaid] = useState(false);
+
 
 	const style = {
 		position: 'absolute',
@@ -46,66 +53,165 @@ export default function Register() {
 		setIsStudent(false);
 	};
 
+	const openWindowAndListen = (platform) => {
+		let user ={
+			name: username,
+			email: email,
+			school: school,
+			grade: grade,
+					password: password,
+					signature: isStudent
+		}
+
+		let url = process.env.REACT_APP_S_HOST + ':' + process.env.REACT_APP_S_PORT + `/api/payment/create?currency=USD&user`;
+
+		window.open(url, "_top");
+
+
+		// window.addEventListener("message", (message) => {
+		// 	if (message.data.user) onSuccessfulLogin(message.data.user);
+		// 	else if (message.data.err) failureToaster(message.data.err);
+		// });
+	};
+
+	const registerUser = ()=>{
+
+		console.log("function runs")
+		
+
+			// setIsLoading(true);
+	
+			// if(validSchoolID || !isStudent){
+				fetch(process.env.REACT_APP_S_HOST + ':' + process.env.REACT_APP_S_PORT + '/api/user/register', {
+				  method: 'POST',
+				  headers: {
+					'Content-Type': 'application/json',
+				  },
+				  body: JSON.stringify({
+					name: username,
+					email: email,
+					school: school,
+					grade: grade,
+					password: password,
+					signature: isStudent
+				  })
+				})
+				  .then(response => {
+					if (response.ok) {
+					  setSuccess(true);
+					  return response.json()
+					}else {
+					  setIsLoading(false);
+					  setSuccess(false);
+					  throw new Error('Could not register');
+					}
+				  })
+				  .then(data => {
+				  
+					const serviceId = 'service_vxwo8t4';
+					const templateId = 'template_c4fc73p';
+					const publicKey = 'Ak_wlu-nZjVMoQtG8';
+			  
+					const templateParams = {
+					  username: username,
+					  email: email,
+					  school: school,
+					  grade: grade,
+					  password: password
+					};
+			  
+					emailjs.send(serviceId, templateId, templateParams, publicKey)
+					  .then((result) => {
+						console.log(result.text);
+					  }, (error) => {
+						console.log(error.text);
+					  });
+			  
+					console.log(data)
+				  })
+				  .catch((error) => {
+					console.error('Error:', error);
+				  });
+			//   }else{
+			// 	setIsLoading(false);
+			// 	setSuccess(false);
+			// 	console.error('Invalid School ID');
+			//   }
+
+
+	}
+
+
+
+
 	const handleSubmit = (event) => {
 		event.preventDefault();
-		setIsLoading(true);
+		openWindowAndListen()
+
 		
-		if(validSchoolID || !isStudent){
-		  fetch(process.env.REACT_APP_S_HOST + ':' + process.env.REACT_APP_S_PORT + '/api/user/register', {
-			method: 'POST',
-			headers: {
-			  'Content-Type': 'application/json',
-			},
-			body: JSON.stringify({
-			  name: username,
-			  email: email,
-			  school: school,
-			  grade: grade,
-			  password: password,
-			  signature: isStudent
-			})
-		  })
-			.then(response => {
-			  if (response.ok) {
-				setSuccess(true);
-				return response.json()
-			  }else {
-				setIsLoading(false);
-				setSuccess(false);
-				throw new Error('Could not register');
-			  }
-			})
-			.then(data => {
-			  // Send email with account information (sanethia@yoursecondshot.com)
-			  const serviceId = 'service_vxwo8t4';
-			  const templateId = 'template_c4fc73p';
-			  const publicKey = 'Ak_wlu-nZjVMoQtG8';
+		// 	// setIsLoading(true);
+	
+		//  if(validSchoolID || !isStudent){
+		//   fetch(process.env.REACT_APP_S_HOST + ':' + process.env.REACT_APP_S_PORT + '/api/user/register', {
+		// 	method: 'POST',
+		// 	headers: {
+		// 	  'Content-Type': 'application/json',
+		// 	},
+		// 	body: JSON.stringify({
+		// 	  name: username,
+		// 	  email: email,
+		// 	  school: school,
+		// 	  grade: grade,
+		// 	  password: password,
+		// 	  signature: isStudent
+		// 	})
+		//   })
+		// 	.then(response => {
+		// 	  if (response.ok) {
+		// 		setSuccess(true);
+		// 		return response.json()
+		// 	  }else {
+		// 		setIsLoading(false);
+		// 		setSuccess(false);
+		// 		throw new Error('Could not register');
+		// 	  }
+		// 	})
+		// 	.then(data => {
+			
+		// 	  const serviceId = 'service_vxwo8t4';
+		// 	  const templateId = 'template_c4fc73p';
+		// 	  const publicKey = 'Ak_wlu-nZjVMoQtG8';
 		
-			  const templateParams = {
-				username: username,
-				email: email,
-				school: school,
-				grade: grade,
-				password: password
-			  };
+		// 	  const templateParams = {
+		// 		username: username,
+		// 		email: email,
+		// 		school: school,
+		// 		grade: grade,
+		// 		password: password
+		// 	  };
 		
-			  emailjs.send(serviceId, templateId, templateParams, publicKey)
-				.then((result) => {
-				  console.log(result.text);
-				}, (error) => {
-				  console.log(error.text);
-				});
+		// 	  emailjs.send(serviceId, templateId, templateParams, publicKey)
+		// 		.then((result) => {
+		// 		  console.log(result.text);
+		// 		}, (error) => {
+		// 		  console.log(error.text);
+		// 		});
 		
-			  console.log(data)
-			})
-			.catch((error) => {
-			  console.error('Error:', error);
-			});
-		}else{
-		  setIsLoading(false);
-		  setSuccess(false);
-		  console.error('Invalid School ID');
-		}
+		// 	  console.log(data)
+		// 	})
+		// 	.catch((error) => {
+		// 	  console.error('Error:', error);
+		// 	});
+		// }else{
+		//   setIsLoading(false);
+		//   setSuccess(false);
+		//   console.error('Invalid School ID');
+		// }
+			
+		
+
+		
+		
 	}
 
 	const handleEmail = (e)=>{
@@ -136,6 +242,16 @@ export default function Register() {
 			setValidSchoolID(false);
 		}
 	}
+
+	useEffect(() => {
+		if (payment == "paid") {
+			console.log("true")
+			registerUser()
+			
+		}
+	  }, [payment]);
+	  
+	
   
 	return (
 		<div className="max-w-4xl mx-auto justify-middle py-3 block">
@@ -206,11 +322,11 @@ export default function Register() {
 				  </p>
 				</Box>:
 				<Box sx={style}>
-				  <h2 className="text-xl">
+				  {/* <h2 className="text-xl">
 					Payment Feature Coming Soon!
-				  </h2>
+				  </h2> */}
 				  <p className="text-lg" id="modal-modal-description" sx={{ mt: 2 }}>
-				  	{success ? "(Registration was SUCCESSFUL, but future versions will require payment)" : isLoading ? "" : "(Registration was UNSUCCESSFUL...future versions will require payment)"}
+				  	{success ? "Registration was SUCCESSFUL" :  "Registration was UNSUCCESSFUL"}
 				  </p>
 				</Box>}
 			  </Modal>

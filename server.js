@@ -19,6 +19,7 @@ import userRouter from './server/routes/userRouter.js';
 import quizRouter from './server/routes/quizRouter.js';
 import careerRouter from './server/routes/careerRouter.js';
 import accessCodeRouter from './server/routes/accessCodeRouter.js';
+import paymentRouter from './server/routes/paymentRouter.js';
 
 // heroku shenanigans
 //require("dotenv").config();
@@ -68,6 +69,7 @@ app.use(cors());
 app.use('/api/clusters', clusterRouter);
 app.use('/api/dummy', dummyRouter);
 app.use('/api/user', userRouter);
+app.use('/api/payment', paymentRouter);
 app.use('/api/quiz', quizRouter);
 app.use('/api/career', careerRouter);
 app.use('/api/access_code', accessCodeRouter);
