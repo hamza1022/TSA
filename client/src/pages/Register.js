@@ -300,7 +300,11 @@ export default function Register() {
 		 removeErrorParam()
     }
 	else if(payment =="unpaid"){
+		setIsStudent(false);
+    setIsLoading(false)
 		setSuccess(false);
+    handleOpen()
+    removeErrorParam()
 	}
   }, [payment]);
 
@@ -433,7 +437,7 @@ export default function Register() {
                   sx={{ mt: 2 }}
                 >
 
-{success ? "Registration is SUCCESSFUL please click on login to proceed further !" : isLoading ? "Loading the Payment...! " : "(Registration is UNSUCCESSFUL)"}
+{success ? "Registration is SUCCESSFUL please click on login to proceed further !" : isLoading ? "Loading the Payment...! " : "Registration is UNSUCCESSFUL"}
 
 
              
