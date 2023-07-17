@@ -1,339 +1,453 @@
 import React, { useEffect, useState } from "react";
-import { Navigate,useLocation  } from "react-router-dom";
-import TextField from '@mui/material/TextField';
-import Stack from '@mui/material/Stack';
-import Button from '@mui/material/Button';
-import Box from '@mui/material/Box';
-import Modal from '@mui/material/Modal';
-import emailjs from 'emailjs-com';
+import { Navigate, useLocation,useSearchParams  } from "react-router-dom";
+import TextField from "@mui/material/TextField";
+import Stack from "@mui/material/Stack";
+import Button from "@mui/material/Button";
+import Box from "@mui/material/Box";
+import Modal from "@mui/material/Modal";
+import emailjs from "emailjs-com";
 //import PaymentForm from "../components/paymentform";
 
 export default function Register() {
-	// ... your other useState declarations
-	const loggedInUser = localStorage.getItem("token");
-
-	const location = useLocation();
-	const params = new URLSearchParams(location.search);
-	const payment = params.get('payment');
-
-	const [username, setName] = useState("");
-  	const [email, setEmail] = useState("");
-  	const [school, setSchool] = useState("");
-  	const [grade, setGrade] = useState("");
-	const [password, setPassword] =  useState("");
-	const [success, setSuccess] = useState(false);
-	const [open, setOpen] = useState(false);
-	const handleOpen = () => setOpen(true);
-	const handleClose = () => setOpen(false);
-	const [isLoading, setIsLoading] = useState(false);
-	const [isStudent, setIsStudent] = useState(true);
-	const [schoolId, setSchoolId] = useState("");
-	const [validSchoolID, setValidSchoolID] = useState(false);
-	const [paymentPaid , setPaymentPaid] = useState(false);
 
 
-	const style = {
-		position: 'absolute',
-		top: '50%',
-		left: '50%',
-		transform: 'translate(-50%, -50%)',
-		width: 400,
-		bgcolor: 'background.paper',
-		border: '2px solid #000',
-		boxShadow: 24,
-		p: 4,
-	};
-
-	// Add these two functions to handle button clicks
-	const handleStudentButtonClick = () => {
-		setIsStudent(true);
-	};
-
-	const handleCustomerButtonClick = () => {
-		setIsStudent(false);
-	};
-
-	const openWindowAndListen = (platform) => {
-		let user ={
-			name: username,
-			email: email,
-			school: school,
-			grade: grade,
-					password: password,
-					signature: isStudent
-		}
-
-		let url = process.env.REACT_APP_S_HOST + ':' + process.env.REACT_APP_S_PORT + `/api/payment/create?currency=USD&user`;
-
-		window.open(url, "_top");
+	const [searchParams, setSearchParams] = useSearchParams();
 
 
-		// window.addEventListener("message", (message) => {
-		// 	if (message.data.user) onSuccessfulLogin(message.data.user);
-		// 	else if (message.data.err) failureToaster(message.data.err);
-		// });
-	};
-
-	const registerUser = ()=>{
-
-		console.log("function runs")
-		
-
-			// setIsLoading(true);
-	
-			// if(validSchoolID || !isStudent){
-				fetch(process.env.REACT_APP_S_HOST + ':' + process.env.REACT_APP_S_PORT + '/api/user/register', {
-				  method: 'POST',
-				  headers: {
-					'Content-Type': 'application/json',
-				  },
-				  body: JSON.stringify({
-					name: username,
-					email: email,
-					school: school,
-					grade: grade,
-					password: password,
-					signature: isStudent
-				  })
-				})
-				  .then(response => {
-					if (response.ok) {
-					  setSuccess(true);
-					  return response.json()
-					}else {
-					  setIsLoading(false);
-					  setSuccess(false);
-					  throw new Error('Could not register');
-					}
-				  })
-				  .then(data => {
-				  
-					const serviceId = 'service_vxwo8t4';
-					const templateId = 'template_c4fc73p';
-					const publicKey = 'Ak_wlu-nZjVMoQtG8';
-			  
-					const templateParams = {
-					  username: username,
-					  email: email,
-					  school: school,
-					  grade: grade,
-					  password: password
-					};
-			  
-					emailjs.send(serviceId, templateId, templateParams, publicKey)
-					  .then((result) => {
-						console.log(result.text);
-					  }, (error) => {
-						console.log(error.text);
-					  });
-			  
-					console.log(data)
-				  })
-				  .catch((error) => {
-					console.error('Error:', error);
-				  });
-			//   }else{
-			// 	setIsLoading(false);
-			// 	setSuccess(false);
-			// 	console.error('Invalid School ID');
-			//   }
-
-
-	}
+	const [payment, setPayment] = useState(
+		searchParams.get("payment")
+	);
 
 
 
+  // ... your other useState declarations
+  const loggedInUser = localStorage.getItem("token");
 
-	const handleSubmit = (event) => {
-		event.preventDefault();
-		openWindowAndListen()
 
-		
-		// 	// setIsLoading(true);
-	
-		//  if(validSchoolID || !isStudent){
-		//   fetch(process.env.REACT_APP_S_HOST + ':' + process.env.REACT_APP_S_PORT + '/api/user/register', {
-		// 	method: 'POST',
-		// 	headers: {
-		// 	  'Content-Type': 'application/json',
-		// 	},
-		// 	body: JSON.stringify({
-		// 	  name: username,
-		// 	  email: email,
-		// 	  school: school,
-		// 	  grade: grade,
-		// 	  password: password,
-		// 	  signature: isStudent
-		// 	})
-		//   })
-		// 	.then(response => {
-		// 	  if (response.ok) {
-		// 		setSuccess(true);
-		// 		return response.json()
-		// 	  }else {
-		// 		setIsLoading(false);
-		// 		setSuccess(false);
-		// 		throw new Error('Could not register');
-		// 	  }
-		// 	})
-		// 	.then(data => {
-			
-		// 	  const serviceId = 'service_vxwo8t4';
-		// 	  const templateId = 'template_c4fc73p';
-		// 	  const publicKey = 'Ak_wlu-nZjVMoQtG8';
-		
-		// 	  const templateParams = {
-		// 		username: username,
-		// 		email: email,
-		// 		school: school,
-		// 		grade: grade,
-		// 		password: password
-		// 	  };
-		
-		// 	  emailjs.send(serviceId, templateId, templateParams, publicKey)
-		// 		.then((result) => {
-		// 		  console.log(result.text);
-		// 		}, (error) => {
-		// 		  console.log(error.text);
-		// 		});
-		
-		// 	  console.log(data)
-		// 	})
-		// 	.catch((error) => {
-		// 	  console.error('Error:', error);
-		// 	});
-		// }else{
-		//   setIsLoading(false);
-		//   setSuccess(false);
-		//   console.error('Invalid School ID');
-		// }
-			
-		
 
-		
-		
-	}
+  const [username, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [school, setSchool] = useState("");
+  const [grade, setGrade] = useState("");
+  const [password, setPassword] = useState("");
+  const [success, setSuccess] = useState(false);
+  const [open, setOpen] = useState(false);
+  const handleOpen = () => setOpen(true);
+  const handleClose = () => setOpen(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [isStudent, setIsStudent] = useState(true);
+  const [schoolId, setSchoolId] = useState("");
+  const [validSchoolID, setValidSchoolID] = useState(false);
 
-	const handleEmail = (e)=>{
-		setEmail(e.target.value);
-	}
+  const style = {
+    position: "absolute",
+    top: "50%",
+    left: "50%",
+    transform: "translate(-50%, -50%)",
+    width: 400,
+    bgcolor: "background.paper",
+    border: "2px solid #000",
+    boxShadow: 24,
+    p: 4,
+  };
 
-	const handlePassword = (e)=>{
-		setPassword(e.target.value);
-	}
+  console.log("success",success)
+  console.log("loading",isLoading)
+  console.log("student",isStudent)
+  console.log("loggedInUser",loggedInUser)
 
-	// Add this function to validate the school ID
-	const validateSchoolId = async (id) => {
-		const response = await fetch(process.env.REACT_APP_S_HOST + ':' + process.env.REACT_APP_S_PORT + '/api/access_code/get_school_id/' + id);
-		const data = await response.json();
 
-		return data.valid;
-	}
 
-	const handleSchoolIdChange = async (e) => {
-		const id = e.target.value;
-		setSchoolId(id);
+  // Add these two functions to handle button clicks
+  const handleStudentButtonClick = () => {
+    setIsStudent(true);
+  };
 
-		const isValid = await validateSchoolId(id);
+  const handleCustomerButtonClick = () => {
+    setIsStudent(false);
+  };
 
-		if (isValid) {
-			setValidSchoolID(true);
-		} else {
-			setValidSchoolID(false);
-		}
-	}
+  const openWindowAndListen = () => {
 
-	useEffect(() => {
-		if (payment == "paid") {
-			console.log("true")
-			registerUser()
-			
-		}
-	  }, [payment]);
+    let user = {
+	  username: username,
+      email: email,
+      school: school,
+      grade: grade,
+      password: password,
+      signature: isStudent,
+      isStudent: isStudent,
+    };
+
+    localStorage.setItem("user", JSON.stringify(user));
+
+    let url =
+      process.env.REACT_APP_S_HOST +
+      ":" +
+      process.env.REACT_APP_S_PORT +
+      `/api/payment/create?currency=USD`;
+
+    window.open(url, "_top");
+  };
+
+  const registerUser = () => {
+
+	setIsLoading(true)
+
+    const userString = localStorage.getItem("user");
+    const user = JSON.parse(userString);
+
+
+    if (validSchoolID || !user.isStudent) {
+      fetch(
+        process.env.REACT_APP_S_HOST +
+          ":" +
+          process.env.REACT_APP_S_PORT +
+          "/api/user/register",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            name: user.username,
+            email: user.email,
+            school: user.school,
+            grade: user.grade,
+            password: user.password,
+            signature: user.isStudent,
+          }),
+        }
+      )
+        .then((response) => {
+          if (response.ok) {
+            setSuccess(true);
+            return response.json();
+          } else {
+            setIsLoading(false);
+            setSuccess(false);
+            throw new Error("Could not register");
+          }
+        })
+        .then((data) => {
+          const serviceId = "service_vxwo8t4";
+          const templateId = "template_c4fc73p";
+          const publicKey = "Ak_wlu-nZjVMoQtG8";
+
+          const templateParams = {
+            username: user.username,
+            email: user.email,
+            school: user.school,
+            grade: user.grade,
+            password: user.password,
+          };
+
+          emailjs.send(serviceId, templateId, templateParams, publicKey).then(
+            (result) => {
+              console.log(result.text);
+            },
+            (error) => {
+              console.log(error.text);
+            }
+          );
+
+          console.log(data);
+        })
+        .catch((error) => {
+          console.error("Error:", error);
+        })
+		.finally(()=>{
+			handleOpen()
+		})
+    } else {
+      setIsLoading(false);
+      setSuccess(false);
+      console.error("Invalid School ID");
+    }
+  };
+
+  const handleSubmit = (event) => {
+    event.preventDefault();
+
+	setIsLoading(true);
+
+	if(validSchoolID){
+
+		if (validSchoolID || !isStudent) {
+			fetch(
+			  process.env.REACT_APP_S_HOST +
+				":" +
+				process.env.REACT_APP_S_PORT +
+				"/api/user/register",
+			  {
+				method: "POST",
+				headers: {
+				  "Content-Type": "application/json",
+				},
+				body: JSON.stringify({
+				  name: username,
+				  email:email,
+				  school: school,
+				  grade: grade,
+				  password: password,
+				  signature: isStudent,
+				}),
+			  }
+			)
+			  .then((response) => {
+				if (response.ok) {
+				  setSuccess(true);
+				  return response.json();
+				} else {
+				  setIsLoading(false);
+				  setSuccess(false);
+				  throw new Error("Could not register");
+				}
+			  })
+			  .then((data) => {
+				const serviceId = "service_vxwo8t4";
+				const templateId = "template_c4fc73p";
+				const publicKey = "Ak_wlu-nZjVMoQtG8";
 	  
+				const templateParams = {
+				  username: username,
+				  email: email,
+				  school: school,
+				  grade: grade,
+				  password: password,
+				};
+	  
+				emailjs.send(serviceId, templateId, templateParams, publicKey).then(
+				  (result) => {
+					console.log(result.text);
+				  },
+				  (error) => {
+					console.log(error.text);
+				  }
+				);
+	  
+				console.log(data);
+			  })
+			  .catch((error) => {
+				console.error("Error:", error);
+			  });
+		  } else {
+			setIsLoading(false);
+			setSuccess(false);
+			console.error("Invalid School ID");
+		  }
+
+		
+	}else{
+
+		openWindowAndListen();
+	}
+
 	
-  
-	return (
-		<div className="max-w-4xl mx-auto justify-middle py-3 block">
-		  {!loggedInUser ? (
-			<>
-			  <h2 className="text-center my-6 py-3 text-5xl font-semibold">
-				Registration
-			  </h2>
-			  <div className="flex justify-center space-x-2 mb-6">
-				<Button
-				  onClick={handleStudentButtonClick}
-				  style={{
-					backgroundColor: isStudent ? "navy" : "white",
-					color: isStudent ? "white" : "navy",
-					borderColor: "navy",
-					borderStyle: "solid",
-					borderWidth: "1px",
-				  }}
-				>
-				  I Have an Access Code
-				</Button>
-				<Button
-				  onClick={handleCustomerButtonClick}
-				  style={{
-					backgroundColor: !isStudent ? "navy" : "white",
-					color: !isStudent ? "white" : "navy",
-					borderColor: "navy",
-					borderStyle: "solid",
-					borderWidth: "1px",
-				  }}
-				>
-				  Purchase Assessment
-				</Button>
-			  </div>
-			  <Stack
-				component="form"
-				onSubmit={(e) => handleSubmit(e)}
-				sx={{ width: "30ch" }}
-				spacing={2}
-				noValidate
-				autoComplete="off"
-			  >
-				<TextField onChange={e => setName(e.target.value)} value={username} id="outlined-basic" label="Name" variant="outlined" />
-				<TextField onChange={e => handleEmail(e)} value={email} id="outlined-basic" label="E-Mail" variant="outlined" />
-				<TextField onChange={e => setSchool(e.target.value)} value={school} id="outlined-basic" label="School" variant="outlined" />
-				<TextField onChange={e => setGrade(e.target.value)} value={grade} id="outlined-basic" label="Grade" variant="outlined" />
-				<TextField onChange={e => handlePassword(e)} value={password} id="outlined-basic" label="Password" variant="outlined" />
-				{isStudent && (
-				  <>
-					<TextField onChange={e => handleSchoolIdChange(e)} value={schoolId} id="outlined-basic" label="School ID" variant="outlined" />
-				  </>
-				)}
-				<Button onClick={handleOpen} variant="outlined" type="submit">Register</Button>
-			  </Stack>
-			  <Modal
-				open={open}
-				onClose={handleClose}
-				aria-labelledby="modal-modal-title"
-				aria-describedby="modal-modal-description"
-			  >
-				{isStudent?
-				<Box sx={style}>
-				  <h2 className="text-xl">
-					{success ? "Success! You are now registered" : isLoading ? "" : "Oops, We had trouble registering you"}
-				  </h2>
-				  <p className="text-lg" id="modal-modal-description" sx={{ mt: 2 }}>
-					{success ? "Click on login to sign in to your account" : isLoading ? "" : "Check if the school ID is valid and try again"}
-				  </p>
-				</Box>:
-				<Box sx={style}>
-				  {/* <h2 className="text-xl">
+
+    
+
+   
+  };
+
+  const handleEmail = (e) => {
+    setEmail(e.target.value);
+  };
+
+  const handlePassword = (e) => {
+    setPassword(e.target.value);
+  };
+
+  // Add this function to validate the school ID
+  const validateSchoolId = async (id) => {
+    const response = await fetch(
+      process.env.REACT_APP_S_HOST +
+        ":" +
+        process.env.REACT_APP_S_PORT +
+        "/api/access_code/get_school_id/" +
+        id
+    );
+    const data = await response.json();
+
+    return data.valid;
+  };
+
+  const handleSchoolIdChange = async (e) => {
+    const id = e.target.value;
+    setSchoolId(id);
+
+    const isValid = await validateSchoolId(id);
+
+    if (isValid) {
+      setValidSchoolID(true);
+    } else {
+      setValidSchoolID(false);
+    }
+  };
+
+  const removeErrorParam = () => {
+	if (searchParams.has("payment")) {
+		searchParams.delete("payment");
+		setSearchParams(searchParams);
+	}
+};
+
+
+  useEffect(() => {
+    if (payment == "paid") {
+		setIsStudent(false);
+         registerUser();
+		 removeErrorParam()
+    }
+	else if(payment =="unpaid"){
+		setSuccess(false);
+	}
+  }, [payment]);
+
+  return (
+    <div className="max-w-4xl mx-auto justify-middle py-3 block">
+      {!loggedInUser  ? (
+        <>
+          <h2 className="text-center my-6 py-3 text-5xl font-semibold">
+            Registration
+          </h2>
+          <div className="flex justify-center space-x-2 mb-6">
+            <Button
+              onClick={handleStudentButtonClick}
+              style={{
+                backgroundColor: isStudent ? "navy" : "white",
+                color: isStudent ? "white" : "navy",
+                borderColor: "navy",
+                borderStyle: "solid",
+                borderWidth: "1px",
+              }}
+            >
+              I Have an Access Code
+            </Button>
+            <Button
+              onClick={handleCustomerButtonClick}
+              style={{
+                backgroundColor: !isStudent ? "navy" : "white",
+                color: !isStudent ? "white" : "navy",
+                borderColor: "navy",
+                borderStyle: "solid",
+                borderWidth: "1px",
+              }}
+            >
+              Purchase Assessment
+            </Button>
+          </div>
+          <Stack
+            component="form"
+            onSubmit={(e) => handleSubmit(e)}
+            sx={{ width: "30ch" }}
+            spacing={2}
+            noValidate
+            autoComplete="off"
+          >
+            <TextField
+              onChange={(e) => setName(e.target.value)}
+              value={username}
+              id="outlined-basic"
+              label="Name"
+              variant="outlined"
+            />
+            <TextField
+              onChange={(e) => handleEmail(e)}
+              value={email}
+              id="outlined-basic"
+              label="E-Mail"
+              variant="outlined"
+            />
+            <TextField
+              onChange={(e) => setSchool(e.target.value)}
+              value={school}
+              id="outlined-basic"
+              label="School"
+              variant="outlined"
+            />
+            <TextField
+              onChange={(e) => setGrade(e.target.value)}
+              value={grade}
+              id="outlined-basic"
+              label="Grade"
+              variant="outlined"
+            />
+            <TextField
+              onChange={(e) => handlePassword(e)}
+              value={password}
+              id="outlined-basic"
+              label="Password"
+              variant="outlined"
+            />
+            {isStudent && (
+              <>
+                <TextField
+                  onChange={(e) => handleSchoolIdChange(e)}
+                  value={schoolId}
+                  id="outlined-basic"
+                  label="School ID"
+                  variant="outlined"
+                />
+              </>
+            )}
+            <Button onClick={handleOpen} variant="outlined" type="submit">
+              Register
+            </Button>
+          </Stack>
+          <Modal
+            open={open}
+            onClose={handleClose}
+            aria-labelledby="modal-modal-title"
+            aria-describedby="modal-modal-description"
+          >
+            {isStudent ? (
+              <Box sx={style}>
+                <h2 className="text-xl">
+                  {success
+                    ? "Success! You are now registered"
+                    : isLoading
+                    ? ""
+                    : "Oops, We had trouble registering you"}
+                </h2>
+                <p
+                  className="text-lg"
+                  id="modal-modal-description"
+                  sx={{ mt: 2 }}
+                >
+                  {success
+                    ? "Click on login to sign in to your account"
+                    : isLoading
+                    ? ""
+                    : "Check if the school ID is valid and try again"}
+                </p>
+              </Box>
+            ) : (
+              <Box sx={style}>
+                {/* <h2 className="text-xl">
 					Payment Feature Coming Soon!
 				  </h2> */}
-				  <p className="text-lg" id="modal-modal-description" sx={{ mt: 2 }}>
-				  	{success ? "Registration was SUCCESSFUL" :  "Registration was UNSUCCESSFUL"}
-				  </p>
-				</Box>}
-			  </Modal>
-			</>
-			) : (
-			<Navigate to="/" />
-			)}
-		</div>
-	);
+                <p
+                  className="text-lg"
+                  id="modal-modal-description"
+                  sx={{ mt: 2 }}
+                >
+
+{success ? "Registration is SUCCESSFUL please click on login to proceed further !" : isLoading ? "Loading the Payment...! " : "(Registration is UNSUCCESSFUL)"}
+
+
+             
+
+			
+
+                </p>
+              </Box>
+            )}
+          </Modal>
+        </>
+      ) : (
+        <Navigate to="/" />
+      )}
+    </div>
+  );
 }
