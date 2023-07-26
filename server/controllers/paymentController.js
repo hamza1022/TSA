@@ -59,6 +59,7 @@ export const createPayment = async (req, res) => {
     
       paypal.payment.create(payment, function (error, payment) {
         if (error) {
+          console.log(error.response)
 				return res.status(400).json(error);
         } else {
           return res.redirect(payment.links[1].href);
@@ -66,9 +67,6 @@ export const createPayment = async (req, res) => {
       });
 
 
-
-
-	
 }
 
 
