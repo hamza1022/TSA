@@ -19,7 +19,7 @@ export const createPayment = async (req, res) => {
 
     let {currency} = req.query
 
-    let amount = 50
+    let amount = 20
 
 
     let payment = {
