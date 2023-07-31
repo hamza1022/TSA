@@ -12,16 +12,11 @@ paypal.configure({
 
 
 
+
+
 export const createPayment = async (req, res) => {
-
-
-
-
     let {currency} = req.query
-
     let amount = 20
-
-
     let payment = {
         intent: "sale",
         payer: {
