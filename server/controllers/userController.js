@@ -19,6 +19,26 @@ async function createJWT (payload, privateKey, res) {
 	res.status(200).json({"token": jwt, "_id": payload._id, "isAdmin": payload.isAdmin});
 }
 
+
+export const checkUser = async (req, res) => {
+	if (!(req.body.email )){
+
+		return res.status(400).json({"err": "Missing field(s)"});
+	}
+	try {
+
+		const existingUser =  await User.findOne({email:req.body.email})
+		if (existingUser) {
+			return res.status(409).json({ err: "Email is already in use" });
+		  }
+		  return res.status(200).json({ message: "Email is available" });
+		
+	} catch (error) {
+		return res.status(500).json({ err: "Internal server error" });
+	}
+}
+
+
 export const registerUser = async (req, res) => {
 	// Check if the required fields are present
 	if (!(req.body.name && req.body.email && req.body.password))

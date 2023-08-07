@@ -5,6 +5,8 @@ const userRouter = express.Router();
 
 // user regristration and stuff
 userRouter.post('/register', userController.registerUser);
+userRouter.post('/check', userController.checkUser);
+
 userRouter.post('/login', userController.loginUser);
 userRouter.post('/update_self', jwtMiddleware.loginRequired, userController.updateSelf);
 userRouter.delete('/delete_self', jwtMiddleware.loginRequired, userController.deleteSelf);
